@@ -33,6 +33,7 @@
 				Vector email = new Vector();
 				Vector subject = new Vector();
 				Vector rcount = new Vector();
+				Vector key_id = new Vector();
 				
 				int where = 1;
 				
@@ -83,12 +84,13 @@
 				
 				try {
 					st = con.createStatement();
-					rs = st.executeQuery("select * from freeboard order by id desc");
+					rs = st.executeQuery("select * from freeboard order by id desc");// order by masterid desc, replynum, step, id
 					
 					if(!(rs.next())){
 						out.println("게시판에 올린 글이 없습니다.");
 					} else {
 						do{
+							key_id.add(new Integer(rs.getInt("id")));
 							name.add(rs.getString("name"));
 							email.add(rs.getString("email"));
 							String idate = rs.getString("inputdate");
@@ -127,7 +129,9 @@
 							out.println("<td align='center'>");
 							out.println(id + "</td>");
 							out.println("<td>");
-							out.println(subject.get(j) + "</td>");
+							String click = "<a href=freeboard_read.jsp?id=" + key_id.get(j);
+							click = click + "&page=" + where + ">" +subject.get(j) + "</a>";
+							out.println(click + "</td>");
 							out.println("<td align='center'>");
 							out.println(email2 + "</td>");
 							out.println("<td>");
