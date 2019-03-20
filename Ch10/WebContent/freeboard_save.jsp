@@ -21,7 +21,9 @@
 		
 		if(content.length() == 1)
 			content += " ";
-		
+
+		//Statement 객체를사용 - 홑따옴표로 감싼 내용에 DB에 사입되지 않는 문제를 해결
+		//PreparedStatement 객체를 사용함으로써 해결
 		/* while((pos=content.indexOf("\'", pos)) != -1 ) {
 			String left = content.substring(0, pos);
 			String right = content.substring(pos, content.length());
@@ -56,12 +58,15 @@
 			} else {
 				id = rs.getInt(1) + 1;
 				rs.close();
-			}/* 
+			}
+			
+			//Statement 객체 사용 -> 홑따옴표 입력시 문제 발현
+			/* 
 			sql = "insert into freeboard(id,name,password,email,subject,content,inputdate,masterid,readcount,replynum,step)";
 			sql += " values (" + id + ", '" + name + "', '" + password + "', '" + email ;
 			sql += "', '" + subject + "', '" + content + "', '" + ymd + "'," + id + "," + "0,0,0)"; */
 			sql = "insert into freeboard(id,name,password,email,subject,content,inputdate,masterid,readcount,replynum,step)";
-			sql += " values(?,?,?,?,?,?,?,?,?,?,?)";
+			sql += " values(?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0)";
 			pstmt = con.prepareStatement(sql);
 			
 			pstmt.setInt(1, id);
@@ -72,9 +77,6 @@
 			pstmt.setString(6, content);
 			pstmt.setString(7, ymd);
 			pstmt.setInt(8, id);
-			pstmt.setInt(9, 0);
-			pstmt.setInt(10, 0);
-			pstmt.setInt(11, 0);
 			
 			cnt = pstmt.executeUpdate();
 			/* cnt = st.executeUpdate(sql); */
