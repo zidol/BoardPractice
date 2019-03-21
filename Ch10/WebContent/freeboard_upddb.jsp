@@ -21,7 +21,7 @@
 	int pos = 0;
 	String cont = request.getParameter("content");
 	
-	if(cont.length() == 1) {
+	/* if(cont.length() == 1) {
 		cont = cont + " ";
 		while((pos = cont.indexOf("\'", pos)) != -1) {
 			String left = cont.substring(0, pos);
@@ -29,7 +29,7 @@
 			cont = left + "\'" + right;
 			pos += 2;
 		}
-	}
+	} */
 	
 	int id = Integer.parseInt(request.getParameter("id"));
 	
