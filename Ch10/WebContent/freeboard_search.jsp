@@ -1,29 +1,103 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, java.sql.*" %>
+	pageEncoding="UTF-8"%>
+<%@ page import="java.util.*, java.sql.*"%>
+<%
+	request.setCharacterEncoding("utf-8");
+%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>게시판 리스트</title>
-<script type="text/javascript">
-	function check() {
-		with(document.msgsearch) {
-			if(sval.value.length==0) {
-				alert("검색어를 입력해 주세요.!!");
-				sval.focus();
-				return false;
-			}
-			document.msgsearch.submit();
-		}
-	}
-</script>
-<link href="freeboard.css" rel="stylesheet" type="text/css">
+<title>게시판 검색모드</title>
 </head>
 <body>
 	<p>
-	<p align="center"><font color="#0000ff" face="굴림" size="3"><strong>자유 게시판</strong></font></p>
-	<p>
+	<p align="center">
+		<font color="#0000ff" face="굴림" size="3"> <strong>자유게시판(검색모드)</strong>
+		</font>
+	</p>
+	<form action="freeboard_search.jsp" method="post" name="search">
+		<table border="0" width="600" align="center">
+			<tr>
+				<td align="left" width="30%" valign="bottom">[<a
+					href="freeboard_list.jsp">자유게시판(일반모드)</a>]
+				</td>
+				<td align="right" width="70%" valign="bottom"><font size="2"
+					face="굴림"> <select name="stype">
+							<%
+								String cond = null;
+								int what = 1;
+								String val = null;
+								if (request.getParameter("stype") != null) {
+									what = Integer.parseInt(request.getParameter("stype"));
+									val = request.getParameter("sval");
+									if (what == 1) {
+										out.println("<option value=1 selected>이름");
+										cond = " where name like '%" + val + "%'";
+									} else {
+										out.println("<option value=1>이름");
+									}
+
+									if (what == 2) {
+										out.println("<option value=2 selected>제목");
+										cond = " where subject like '%" + val + "%'";
+									} else {
+										out.println("<option value=2>이름");
+									}
+
+									if (what == 3) {
+										out.println("<option value=3 selected>내용");
+										cond = " where content like '%" + val + "%'";
+									} else {
+										out.println("<option value=3>내용");
+									}
+
+									if (what == 4) {
+										out.println("<option value=4 selected>이름/제목");
+										cond = " where name like '%" + val + "%'";
+										cond += " or subject like '%" + val + "%'";
+									} else {
+										out.println("<option value=4>이름/제목");
+									}
+
+									if (what == 5) {
+										out.println("<option value=5 selected>이름/내용");
+										cond = " where name like '%" + val + "%'";
+										cond += " or content like '%" + val + "%'";
+									} else {
+										out.println("<option value=5>이름/내용");
+									}
+
+									if (what == 6) {
+										out.println("<option value=6 selected>제목/내용");
+										cond = " where subject like '%" + val + "%'";
+										cond += " or content like '%" + val + "%'";
+									} else {
+										out.println("<option value=6>제목/내용");
+									}
+
+									if (what == 7) {
+										out.println("<option value=7 selected>이름/제목/내용");
+										cond = " where name like '%" + val + "%'";
+										cond += " or subject like '%" + val + "%'";
+										cond += " or content like '%" + val + "%'";
+									} else {
+										out.println("<option value=7>이름/제목/내용");
+									}
+
+									if (val.trim().equals(""))
+										cond = "";
+								}
+							%>
+					</select>
+				</font> 
+				<input type="text" name="sval" value="<%=request.getParameter("sval")%>">
+				<input type="submit" value="검색">
+				</td>
+			</tr>
+		</table>
+	</form>
+	
 	<div align="center">
 		<table border="0" width="600" cellpadding="4" cellspacing="0">
 			<tr align="center">
@@ -97,10 +171,10 @@
 				
 				try {
 					st = con.createStatement();
-					rs = st.executeQuery("select * from freeboard order by masterid desc, replynum, step, id");// order by masterid desc, replynum, step, id
+					rs = st.executeQuery("select * from freeboard" + cond + " order by id desc");// order by masterid desc, replynum, step, id
 					
 					if(!(rs.next())){
-						out.println("게시판에 올린 글이 없습니다.");
+						out.println("해당하는 글이 없습니다.");
 					} else {
 						do{
 							key_id.add(new Integer(rs.getInt("id")));
@@ -168,8 +242,10 @@
 					out.println(e);
 				}
 				if(wheregroup > 1) {
-					out.println("[<a href='freeboard_list.jsp?gogroup=1'>처음</a>]");
-					out.println("[<a href='freeboard_list.jsp?gogroup="+priorgroup +"'" + ">이전</a>]");
+					out.println("[<a href='freeboard_search.jsp?gogroup=1");
+					out.println("&stype=" + what + "&sval=" + val + ">처음</a>]");
+					out.println("[<a href='freeboard_search.jsp?gogroup="+priorgroup);
+					out.println("&stype=" + what + "&sval=" + val + ">이전</a>]");
 				} else {
 					out.println("[처음]");
 					out.println("[이전]");
@@ -179,50 +255,23 @@
 					for(int j = startpage; j<=endpage; j++) {
 						if(j == where)
 							out.println("[" + j + "]");
-						else
-							out.println("[<a href=freeboard_list.jsp?go=" + j + ">" + j + "</a>]");
+						else{
+							out.println("[<a href=freeboard_search.jsp?go=" + j);
+							out.println("&stype=" + what + "&sval=" + val + ">" + j +"</a>]");
+						}
 					}
 				}
 				if(wheregroup < totalgroup) {
-					out.println("[<a href=freeboard_list.jsp?gogroup="+ nextgroup + ">다음</a>]");
-					out.println("[<a href=freeboard_list.jsp?gogroup="+ totalgroup + ">마지막</a>]");
+					out.println("[<a href=freeboard_search.jsp?gogroup="+ nextgroup);
+					out.println("&stype=" + what + "&sval=" + val + ">다음</a>]");
+					out.println("[<a href=freeboard_list.jsp?gogroup="+ totalgroup);
+					out.println("&stype=" + what + "&sval=" + val + ">마지막</a>]");
 				}else {
 					out.println("[다음]");
 					out.println("[마지막]");
 				}
-				out.println("전체 글수 :" + totalrows);
+				out.println("검색된 글수 :" + totalrows);
 			%>
-			
-			<!-- <table border="0" width="600" cellpadding="0" cellspacing="0">
-				<tr>
-					<td align="right" valign="bottom">
-						<a href="freeboard_write.html"><img src="image/write.gif" width="66" height="21" border="0"></a>
-					</td>
-				</tr>
-			</table> -->
-			<form method="post" name="msgsearch" action="freeboard_search.jsp">
-				<table border="0" width="600" cellpadding="0" cellspacing="0">
-					<tr>
-						<td align="right" width="241">
-							<select name="stype">
-								<option value="1">이름
-								<option value="2">제목
-								<option value="3">내용
-								<option value="4">이름+제목
-								<option value="5">이름+내용
-								<option value="6">제목+내용
-								<option value="7">이름+제목+내용
-							</select>
-						</td>
-						<td width="127" align="center">
-							<input type="text" size="17" name="sval">
-						 </td>
-						 <td width="115">&nbsp;<a href="#" onclick="check();"><img src="image/serach.gif" border="0" align="absmiddle"></a></td>
-						 <td align="right" valign="bottom" width="117">
-						<a href="freeboard_write.html"><img src="image/write.gif" border="0"></a>
-					</td>
-				</table>
-			</form>
 	</div>
 </body>
 </html>
