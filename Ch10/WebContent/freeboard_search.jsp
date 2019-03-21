@@ -42,7 +42,7 @@
 										out.println("<option value=2 selected>제목");
 										cond = " where subject like '%" + val + "%'";
 									} else {
-										out.println("<option value=2>이름");
+										out.println("<option value=2>제목");
 									}
 
 									if (what == 3) {
@@ -85,8 +85,10 @@
 										out.println("<option value=7>이름/제목/내용");
 									}
 
+									
 									if (val.trim().equals(""))
 										cond = "";
+									System.out.println(val);
 								}
 							%>
 					</select>
@@ -171,7 +173,9 @@
 				
 				try {
 					st = con.createStatement();
-					rs = st.executeQuery("select * from freeboard" + cond + " order by id desc");// order by masterid desc, replynum, step, id
+					String sql = "select * from freeboard " + cond + " order by id desc";
+					System.out.println(sql);
+					rs = st.executeQuery(sql);// order by masterid desc, replynum, step, id
 					
 					if(!(rs.next())){
 						out.println("해당하는 글이 없습니다.");
@@ -256,21 +260,24 @@
 						if(j == where)
 							out.println("[" + j + "]");
 						else{
-							out.println("[<a href=freeboard_search.jsp?go=" + j);
-							out.println("&stype=" + what + "&sval=" + val + ">" + j +"</a>]");
+							out.print("[<a href=freeboard_search.jsp?go=" + j);
+							out.print("&stype=" + what + "&sval=" + val + ">" + j +"</a>]");
 						}
 					}
 				}
 				if(wheregroup < totalgroup) {
-					out.println("[<a href=freeboard_search.jsp?gogroup="+ nextgroup);
-					out.println("&stype=" + what + "&sval=" + val + ">다음</a>]");
-					out.println("[<a href=freeboard_list.jsp?gogroup="+ totalgroup);
-					out.println("&stype=" + what + "&sval=" + val + ">마지막</a>]");
+					out.print("[<a href=freeboard_search.jsp?gogroup="+ nextgroup);
+					out.print("&stype=" + what + "&sval=" + val + ">다음</a>]");
+					out.print("[<a href=freeboard_list.jsp?gogroup="+ totalgroup);
+					out.print("&stype=" + what + "&sval=" + val + ">마지막</a>]");
 				}else {
 					out.println("[다음]");
 					out.println("[마지막]");
 				}
 				out.println("검색된 글수 :" + totalrows);
+				System.out.println(what);
+
+				System.out.println(val);
 			%>
 	</div>
 </body>
